@@ -48,24 +48,17 @@
       );
       ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
       ctx.fillStyle = '#991111';
-      drawRect(-50, -50, 100, 100);
-
-      ctx.fillStyle = '#eecc77';
-      drawRect(-35, -35, 20, 20);
-      drawRect(15, -35, 20, 20);
-      drawRect(-35, 15, 70, 20);
+      drawRect(-150, -50, 200, 100);
 
       ctx.fillStyle = '#fff';
-      drawText('Simple Zoom', -100, -100, 32, 'courier');
+      drawText('Simple', -100, 0, 32, 'georgia');
 
       requestAnimationFrame(draw);
     }
 
-    // Gets the relevant location from a mouse or single touch event
+    // Gets the relevant location from a mouse
     function getEventLocation(e) {
-      if (e.touches && e.touches.length == 1) {
-        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      } else if (e.clientX && e.clientY) {
+      if (e.clientX && e.clientY) {
         return { x: e.clientX, y: e.clientY };
       }
     }
