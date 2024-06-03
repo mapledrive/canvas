@@ -8,45 +8,58 @@
   <style>
     html,
     body {
-      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
       margin: 0;
       padding: 0px;
-      overflow: hidden;
     }
 
     #canvas {
-      width: 100%;
-      height: 100%;
+      width: 500px;
+      height: 500px;
       background: #111;
+    }
+
+    button {
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      cursor: pointer;
     }
   </style>
   <body>
-    <!-- This is a very basic canvas example which allows for panning and zooming using a mouse (Click & drag & scrollwheel)  -->
+    <!-- This is a very basic canvas example which allows for panning and zooming using a mouse (Click & drag)  -->
     <!-- Panning lets you move a view to another location without changing its magnification.  -->
     <!-- Zooming lets you view the drawing with more or less magnification. -->
     <!-- https://codepen.io/chengarda/pen/wRxoyB -->
     <canvas id="canvas"></canvas>
+    <button id="zoom-in">Zoom In</button>
+    <button id="zoom-out">Zoom Out</button>
   </body>
   <script>
     let canvas = document.getElementById('canvas');
+    let zoomInButton = document.getElementById('zoom-in');
+    let zoomOutButton = document.getElementById('zoom-out');
     let ctx = canvas.getContext('2d');
 
-    let cameraOffset = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let cameraZoom = 1;
-    let MAX_ZOOM = 5;
-    let MIN_ZOOM = 0.1;
-    let SCROLL_SENSITIVITY = 0.0005;
+    let cameraOffset = { x: 250, y: 250 };
+    let cameraZoom = 1; // Track zoom level (initial: 1)
+    // let MAX_ZOOM = 5;
+    // let MIN_ZOOM = 0.1;
 
     // Функция draw отвечает за непрерывное обновление содержимого элемента canvas.
     function draw() {
       // установка ширины и высоты элемента canvas в соответствии с шириной и высотой окна браузера.
       // Это гарантирует, что canvas заполняет все окно просмотра и изменяет размер при изменении размера окна.
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = 500;
+      canvas.height = 500;
 
       // Эта строка устанавливает центр масштабирования / контекст рисования (ctx) в центр canvas.
       // Это важно, потому что следующая операция scale будет увеличивать/уменьшать масштаб относительно этой центральной точки.
-      ctx.translate(window.innerWidth / 2, window.innerHeight / 2);
+      ctx.translate(250, 250);
 
       // Эта строка применяет текущий уровень масштабирования (cameraZoom) к контексту рисования.
       // Значение больше 1 увеличивает масштаб, значение меньше 1 уменьшает масштаб.
@@ -55,29 +68,26 @@
       //Эта строка снова устанавливает центр масштабирования / контекст рисования (ctx), но на этот раз на величину,
       // определяемую переменной cameraOffset.
       //Это смещение фактически перемещает окно просмотра в пределах увеличенной области canvas.
-      ctx.translate(
-        -window.innerWidth / 2 + cameraOffset.x,
-        -window.innerHeight / 2 + cameraOffset.y
-      );
+      ctx.translate(-250 + cameraOffset.x, -250 + cameraOffset.y);
 
       // Очистка холста. Эта строка очищает всю область canvas, прежде чем рисовать что-либо новое.
       // Это гарантирует, что не осталось никаких остатков от предыдущих кадров.
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, 500, 500);
 
       // Эта строка устанавливает стиль заливки для фигур, нарисованных на canvas, в темно-красный цвет (#991111).
       ctx.fillStyle = '#991111';
 
       // Эта строка рисует прямоугольник на canvas.
       // Прямоугольник имеет положение (-150, -50) относительно текущего контекста рисования, ширину 200 пикселей и высоту 100 пикселей.
-      ctx.fillRect(-150, -50, 200, 100);
+      ctx.fillRect(-50, -25, 100, 50);
 
       // Эта строка устанавливает стиль заливки для текста, нарисованного на canvas, в белый (#fff).
       ctx.fillStyle = '#fff';
 
       // Эта строка устанавливает размер шрифта и шрифт "georgia"
       // Рисует текст "Simple" на canvas. Текст расположен в (-100, 0) относительно текущего контекста рисования.
-      ctx.font = `32px georgia`;
-      ctx.fillText('Simple', -100, 0);
+      ctx.font = `25px georgia`;
+      ctx.fillText('Simple', -35, 5);
 
       // Эта строка вызывает функцию requestAnimationFrame из Animation API браузера.
       // Эта функция планирует вызов функции draw снова, как только браузер будет готов перерисовать canvas.
@@ -121,29 +131,28 @@
     let initialPinchDistance = null;
     let lastZoom = cameraZoom;
 
-    function adjustZoom(zoomAmount, zoomFactor) {
-      if (!isDragging) {
-        if (zoomAmount) {
-          cameraZoom += zoomAmount;
-        } else if (zoomFactor) {
-          console.log(zoomFactor);
-          cameraZoom = zoomFactor * lastZoom;
-        }
-
-        cameraZoom = Math.min(cameraZoom, MAX_ZOOM);
-        cameraZoom = Math.max(cameraZoom, MIN_ZOOM);
-
-        console.log(zoomAmount);
-      }
-    }
-
     canvas.addEventListener('mousedown', onPointerDown);
     canvas.addEventListener('mouseup', onPointerUp);
     canvas.addEventListener('mousemove', onPointerMove);
-    canvas.addEventListener('wheel', e =>
-      adjustZoom(e.deltaY * SCROLL_SENSITIVITY)
-    );
+
+    zoomInButton.addEventListener('click', function () {
+      if (cameraZoom < 17) {
+        console.log(cameraZoom);
+        cameraZoom *= 2; // Double zoom level on zoom in (ensure it doesn't go higher 17)
+        draw();
+      }
+    });
+
+    zoomOutButton.addEventListener('click', function () {
+      if (cameraZoom > 1) {
+        cameraZoom /= 2; // Halve zoom level on zoom out (ensure it doesn't go below 1)
+        draw();
+      }
+    });
 
     draw();
+
+    // TODO когда драгаешь за пределы канвы мышь уходит и при возврате приклеивается
+    // и уже без удерживания нажатой мыши блок ездит за курсором
   </script>
 </html>
